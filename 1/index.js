@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-fs.readFile('input.txt', 'utf8', (err, data) => {
+fs.readFile(`${__dirname}/input.txt`, 'utf8', (err, data) => {
   const changes = data.split('\n').map(a => parseInt(a, 10)).filter(a => !Number.isNaN(a));
 
   const results = {};
