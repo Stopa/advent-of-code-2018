@@ -1,0 +1,15 @@
+{
+  "name": "advent-of-code-2018",
+  "version": "1.0.0",
+  "description": "My solutions for the Advent of Code 2018 tasks",
+  "main": "index.js",
+  "author": "Stepan Bolotnikov",
+  "license": "ISC",
+  "dependencies": {
+    "eslint": "^5.9.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.2",
+    "eslint-plugin-react": "^7.11.1"
+  }
+}
