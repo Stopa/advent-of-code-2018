@@ -46,17 +46,38 @@ const canvas = Array.apply(null, { length: yMax }).map(() => Array.apply(null, {
 
 let overlapping = 0;
 
-Object.values(cuts).forEach((cut) => {
+const notOverlapped = Object.keys(cuts);
+
+Object.entries(cuts).forEach(([id, cut]) => {
   for (let { y } = cut; y < cut.y + cut.h; y += 1) {
     for (let { x } = cut; x < cut.x + cut.w; x += 1) {
       if (canvas[y][x] === SQUARE_STATUS.EMPTY) {
-        canvas[y][x] = SQUARE_STATUS.FILLED;
-      } else if (canvas[y][x] === SQUARE_STATUS.FILLED) {
+        canvas[y][x] = id;
+      } else if (canvas[y][x] !== SQUARE_STATUS.OVERLAPPING) {
+        const overlappingIdIndex = notOverlapped.indexOf(canvas[y][x]);
+
+        if (overlappingIdIndex !== -1) {
+          notOverlapped.splice(overlappingIdIndex, 1);
+        }
+
+        const currentIdIndex = notOverlapped.indexOf(id);
+
+        if (currentIdIndex !== -1) {
+          notOverlapped.splice(currentIdIndex, 1);
+        }
+
         canvas[y][x] = SQUARE_STATUS.OVERLAPPING;
         overlapping += 1;
+      } else if (canvas[y][x] === SQUARE_STATUS.OVERLAPPING) {
+        const currentIdIndex = notOverlapped.indexOf(id);
+
+        if (currentIdIndex !== -1) {
+          notOverlapped.splice(currentIdIndex, 1);
+        }
       }
     }
   }
 });
 
 console.log(`Overlapping space: ${overlapping} square whatevers`);
+console.log(`Leftovers: ${notOverlapped}`);
