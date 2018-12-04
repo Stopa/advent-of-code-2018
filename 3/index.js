@@ -1,29 +1,61 @@
 const fs = require('fs');
-const { createCanvas } = require('canvas');
-
-const c = createCanvas(1000, 1000);
-const ctx = c.getContext('2d');
-
-ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-
-const out = fs.createWriteStream(`${__dirname}/result.png`);
 
 const data = fs.readFileSync(`${__dirname}/input.txt`, 'utf8');
 
-const cuts = data.split('\n').filter(a => a !== '');
+const cuts = data.split('\n').filter(a => a !== '').map((cut) => {
+  const [, , coords, size] = cut.split(' ');
 
-cuts.forEach((cut) => {
-  const [id, sep, coords, size] = cut.split(' ');
+  const [x, y] = coords.substring(0, coords.length - 1).split(',').map(a => parseInt(a, 10));
 
-  const [x, y] = coords.substring(0, coords.length - 1).split(',');
+  const [w, h] = size.split('x').map(a => parseInt(a, 10));
 
-  const [width, height] = size.split('x');
-
-  ctx.fillRect(x, y, width, height);
+  return {
+    x, y, w, h,
+  };
 });
 
-const stream = c.createPNGStream();
+const { xMax, yMax } = cuts.reduce((result, cut) => {
+  const currentXMax = cut.x + cut.w;
+  const currentYMax = cut.y + cut.h;
+  const currentResult = result;
 
-stream.pipe(out);
+  if (currentXMax > currentResult.xMax) {
+    currentResult.xMax = currentXMax;
+  }
 
-out.on('finish', () => console.log('The PNG file was created.'))
+  if (currentYMax > currentResult.yMax) {
+    currentResult.yMax = currentYMax;
+  }
+
+  return currentResult;
+}, { xMax: 0, yMax: 0 });
+
+const SQUARE_STATUS = {
+  EMPTY: undefined,
+  FILLED: 1,
+  OVERLAPPING: 2,
+};
+
+/*
+ Suppressing ESLint because it wants me to use Array(...{ length: yMax}), but whines that it's
+ non-iterable
+*/
+// eslint-disable-next-line
+const canvas = Array.apply(null, { length: yMax }).map(() => Array.apply(null, { length: xMax }));
+
+let overlapping = 0;
+
+cuts.forEach((cut) => {
+  for (let { y } = cut; y < cut.y + cut.h; y += 1) {
+    for (let { x } = cut; x < cut.x + cut.w; x += 1) {
+      if (canvas[y][x] === SQUARE_STATUS.EMPTY) {
+        canvas[y][x] = SQUARE_STATUS.FILLED;
+      } else if (canvas[y][x] === SQUARE_STATUS.FILLED) {
+        canvas[y][x] = SQUARE_STATUS.OVERLAPPING;
+        overlapping += 1;
+      }
+    }
+  }
+});
+
+console.log(`Overlapping space: ${overlapping} square whatevers`);
