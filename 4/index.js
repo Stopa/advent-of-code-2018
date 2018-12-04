@@ -24,7 +24,7 @@ lines.forEach((line) => {
 
     if (!guards[currentGuard]) {
       // eslint-disable-next-line
-      guards[currentGuard] = { minutes: Array.apply(null, {length: 60}), total: 0};
+      guards[currentGuard] = { minutes: [], total: 0};
     }
   } else if (line[19] === 'f') {
     // guard falls asleep
@@ -46,7 +46,7 @@ const sleepyhead = Object.entries(guards)
   .reduce((prev, curr) => (curr[1].total > prev[1].total ? curr : prev));
 
 const sleepytime = sleepyhead[1].minutes.indexOf(
-  sleepyhead[1].minutes.reduce((max, curr) => (curr === undefined || max > curr ? max : curr)),
+  sleepyhead[1].minutes.reduce((max, curr) => (max > curr ? max : curr)),
 );
 
 console.log(`Guard number ${sleepyhead[0]} slept the most and they slept the most during minute ${sleepytime}`);
