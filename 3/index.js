@@ -2,33 +2,34 @@ const fs = require('fs');
 
 const data = fs.readFileSync(`${__dirname}/input.txt`, 'utf8');
 
-const cuts = data.split('\n').filter(a => a !== '').map((cut) => {
-  const [, , coords, size] = cut.split(' ');
+const cuts = {};
+
+let xMax = 0;
+
+let yMax = 0;
+
+data.split('\n').filter(a => a !== '').forEach((cut) => {
+  const [id, , coords, size] = cut.split(' ');
 
   const [x, y] = coords.substring(0, coords.length - 1).split(',').map(a => parseInt(a, 10));
 
   const [w, h] = size.split('x').map(a => parseInt(a, 10));
 
-  return {
+  const currentXMax = x + w;
+  const currentYMax = y + h;
+
+  if (currentXMax > xMax) {
+    xMax = currentXMax;
+  }
+
+  if (currentYMax > yMax) {
+    yMax = currentYMax;
+  }
+
+  cuts[id] = {
     x, y, w, h,
   };
 });
-
-const { xMax, yMax } = cuts.reduce((result, cut) => {
-  const currentXMax = cut.x + cut.w;
-  const currentYMax = cut.y + cut.h;
-  const currentResult = result;
-
-  if (currentXMax > currentResult.xMax) {
-    currentResult.xMax = currentXMax;
-  }
-
-  if (currentYMax > currentResult.yMax) {
-    currentResult.yMax = currentYMax;
-  }
-
-  return currentResult;
-}, { xMax: 0, yMax: 0 });
 
 const SQUARE_STATUS = {
   EMPTY: undefined,
@@ -45,7 +46,7 @@ const canvas = Array.apply(null, { length: yMax }).map(() => Array.apply(null, {
 
 let overlapping = 0;
 
-cuts.forEach((cut) => {
+Object.values(cuts).forEach((cut) => {
   for (let { y } = cut; y < cut.y + cut.h; y += 1) {
     for (let { x } = cut; x < cut.x + cut.w; x += 1) {
       if (canvas[y][x] === SQUARE_STATUS.EMPTY) {
