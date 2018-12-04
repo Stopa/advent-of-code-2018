@@ -22,4 +22,18 @@ fs.readFile(`${__dirname}/input.txt`, 'utf8', (error, data) => {
   });
 
   console.log(`Checksum is: ${twoCount * threeCount}`);
+
+  function distance(a, b) {
+    return a.split('').reduce((total, letter, index) => (b[index] === letter ? total : total + 1), 0);
+  }
+
+  ids.forEach((id) => {
+    ids.forEach((id2) => {
+      if (distance(id, id2) === 1) {
+        const similarity = id.split('').filter((letter, index) => id2[index] === letter);
+        console.log(`Suitable IDs: \n${id}, \n${id2}`);
+        console.log(`${similarity.join('')}`);
+      }
+    });
+  });
 });
