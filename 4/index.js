@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const data = fs.readFileSync(`${__dirname}/testinput.txt`, 'utf8');
+const data = fs.readFileSync(`${__dirname}/input.txt`, 'utf8');
 
 const stupidTimeRegex = /\[(.{4})-(.{2})-(.{2}) (.{2}):(.{2})\]/;
 
@@ -33,7 +33,7 @@ lines.forEach((line) => {
     // guard wakes up
     const wakeUpTime = parseDate(line);
 
-    for (let i = prevTime.getMinutes(); i < wakeUpTime.getMinutes(); i += 1) {
+    for (let i = prevTime.getMinutes(); i <= wakeUpTime.getMinutes(); i += 1) {
       guards[currentGuard].minutes[i] = (guards[currentGuard].minutes[i] || 0) + 1;
       guards[currentGuard].total += 1;
     }
